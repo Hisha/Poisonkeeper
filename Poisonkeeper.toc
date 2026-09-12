@@ -1,0 +1,12 @@
+## Interface: 30300
+## Title: Poisonkeeper
+## Notes: Rogue poison management addon for World of Warcraft 3.3.5a
+## Author: Your Name
+## Version: 1.0.0
+## SavedVariables: PoisonkeeperDB
+
+Core.lua
+PoisonCatalog.lua
+PoisonData.lua
+Settings.lua
+Commands.lua
