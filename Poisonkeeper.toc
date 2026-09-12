@@ -10,3 +10,4 @@ PoisonCatalog.lua
 PoisonData.lua
 Settings.lua
 Commands.lua
+Vendor.lua
