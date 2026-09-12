@@ -66,6 +66,7 @@ local function SlashCommandHandler(msg)
         end
     elseif (command == "enable" or command == "disable") and argument == "" then
         PoisonkeeperDB.enabled = command == "enable";
+        if Poisonkeeper.ResetWarningBaseline then Poisonkeeper:ResetWarningBaseline(); end
         if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
         print("Poisonkeeper: " .. State(PoisonkeeperDB.enabled));
     elseif aliases[command] then
@@ -85,6 +86,7 @@ local function SlashCommandHandler(msg)
         PrintFamily(family);
     elseif command == "warnings" and (argument == "on" or argument == "off") then
         PoisonkeeperDB.warnings.enabled = argument == "on";
+        if Poisonkeeper.ResetWarningBaseline then Poisonkeeper:ResetWarningBaseline(); end
         print("Warnings setting: " .. State(PoisonkeeperDB.warnings.enabled));
     elseif command == "bar" and (argument == "show" or argument == "hide" or argument == "lock" or argument == "unlock") then
         if argument == "show" or argument == "hide" then
@@ -97,6 +99,7 @@ local function SlashCommandHandler(msg)
     elseif command == "reset" then
         if argument == "confirm" then
             Poisonkeeper:ResetSettings();
+            if Poisonkeeper.ResetWarningBaseline then Poisonkeeper:ResetWarningBaseline(); end
             if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
             print("Poisonkeeper settings restored to defaults.");
         else

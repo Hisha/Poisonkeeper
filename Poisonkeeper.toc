@@ -12,3 +12,4 @@ Settings.lua
 Commands.lua
 Vendor.lua
 Bar.lua
+Warnings.lua
