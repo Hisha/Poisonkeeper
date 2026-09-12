@@ -81,14 +81,27 @@ local function PrepareClick(button, mouseButton)
 end
 
 local function ShowPoisonTooltip(button)
-    if not button.poison or not button.itemLink then return; end
+    if not button.displayPoison or not button.itemName then return; end
     GameTooltip:SetOwner(button, "ANCHOR_RIGHT");
-    GameTooltip:SetHyperlink(button.itemLink);
-    GameTooltip:AddLine("Rank " .. button.poison.rank .. " - In bags: " .. button.bagCount, 1, 1, 1);
-    GameTooltip:AddLine("Left-click: Apply to Main Hand", 0.8, 0.8, 0.8);
-    GameTooltip:AddLine("Right-click: Apply to Off Hand", 0.8, 0.8, 0.8);
-    if MerchantFrame and MerchantFrame:IsShown() then
-        GameTooltip:AddLine("Close the merchant before applying poison.", 1, 0.8, 0);
+    if not button.poison then
+        GameTooltip:SetText(button.itemName);
+        GameTooltip:AddLine("Out of stock", 1, 0.3, 0.3);
+        GameTooltip:AddLine("Managed by Poisonkeeper", 1, 1, 1);
+        GameTooltip:AddLine("Visit a poison vendor to restock.", 0.8, 0.8, 0.8);
+    else
+        GameTooltip:SetHyperlink(button.itemLink);
+        GameTooltip:AddLine("Rank " .. button.poison.rank .. " - In bags: " .. button.bagCount, 1, 1, 1);
+        if button.managed then
+            GameTooltip:AddLine("Managed by Poisonkeeper", 1, 1, 1);
+        else
+            GameTooltip:AddLine("Not managed by Poisonkeeper", 1, 0.3, 0.3);
+            GameTooltip:AddLine("This poison will not be automatically restocked.", 0.8, 0.8, 0.8);
+        end
+        GameTooltip:AddLine("Left-click: Apply to Main Hand", 0.8, 0.8, 0.8);
+        GameTooltip:AddLine("Right-click: Apply to Off Hand", 0.8, 0.8, 0.8);
+        if MerchantFrame and MerchantFrame:IsShown() then
+            GameTooltip:AddLine("Close the merchant before applying poison.", 1, 0.8, 0);
+        end
     end
     GameTooltip:Show();
 end
@@ -208,18 +221,31 @@ RefreshBar = function()
     local visible, incomplete = 0, not counts;
     for _, family in ipairs(families) do
         local button = bar.buttons[family];
-        local poison = counts and HighestOwned(family, counts);
+        local managed = PoisonkeeperDB.poisons[family].enabled;
+        local owned = counts and HighestOwned(family, counts);
+        -- A display-only fallback must never become the secure click selection.
+        local poison = owned;
+        if counts and not poison and managed then
+            poison = Poisonkeeper:GetHighestUsablePoison(family, UnitLevel("player"));
+        end
         local name, link, icon;
         if poison then
             local itemName, itemLink, _, _, _, _, _, _, _, itemIcon = GetItemInfo(poison.itemId);
             name, link, icon = itemName, itemLink, itemIcon;
-            if not name or not link or not icon then incomplete = true; poison = nil; end
+            if not name or not icon or (owned and not link) then incomplete = true; poison = nil; end
         end
         ClearAction(button);
-        button.poison = poison;
+        button.poison = poison and owned or nil;
+        button.displayPoison, button.managed = poison, managed;
         if poison then
-            button.itemLink, button.bagCount = link, counts[poison.itemId];
+            button.itemName, button.itemLink = name, link;
+            button.bagCount = owned and counts[owned.itemId] or 0;
             button.icon:SetTexture(icon);
+            if managed and owned then
+                button.icon:SetVertexColor(1, 1, 1);
+            else
+                button.icon:SetVertexColor(1, 0.3, 0.3);
+            end
             button.count:SetText(button.bagCount);
             button:ClearAllPoints();
             button:SetPoint("LEFT", bar, "LEFT", PADDING + HANDLE_WIDTH + GAP + visible * (BUTTON_SIZE + GAP), 0);
@@ -229,7 +255,7 @@ RefreshBar = function()
         else
             if GameTooltip:IsOwned(button) then GameTooltip:Hide(); end
             button:Hide();
-            button.itemLink, button.bagCount = nil, nil;
+            button.itemName, button.itemLink, button.bagCount = nil, nil, nil;
         end
     end
     bar:SetWidth(PADDING * 2 + HANDLE_WIDTH + visible * (BUTTON_SIZE + GAP));

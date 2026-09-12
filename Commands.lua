@@ -73,6 +73,7 @@ local function SlashCommandHandler(msg)
         local settings = PoisonkeeperDB.poisons[family.key];
         if argument == "on" or argument == "off" then
             settings.enabled = argument == "on";
+            if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
         elseif argument ~= "" then
             local stock = tonumber(argument);
             if not string.match(argument, "^%d+$") or not stock or stock > 1000 then
