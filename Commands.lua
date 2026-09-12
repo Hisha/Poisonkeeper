@@ -1,4 +1,4 @@
--- Slash commands configure settings only; no bar or warning behavior is run here.
+-- Slash commands configure settings; Bar.lua owns the application UI.
 local families = {
     { key = "instant", label = "Instant" },
     { key = "deadly", label = "Deadly" },
@@ -66,6 +66,7 @@ local function SlashCommandHandler(msg)
         end
     elseif (command == "enable" or command == "disable") and argument == "" then
         PoisonkeeperDB.enabled = command == "enable";
+        if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
         print("Poisonkeeper: " .. State(PoisonkeeperDB.enabled));
     elseif aliases[command] then
         local family = aliases[command];
@@ -90,10 +91,12 @@ local function SlashCommandHandler(msg)
         else
             PoisonkeeperDB.bar.locked = argument == "lock";
         end
+        if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
         print("Bar setting: " .. argument);
     elseif command == "reset" then
         if argument == "confirm" then
             Poisonkeeper:ResetSettings();
+            if Poisonkeeper.RefreshPoisonBar then Poisonkeeper:RefreshPoisonBar(); end
             print("Poisonkeeper settings restored to defaults.");
         else
             print("Reset requires confirmation. Use /pk reset confirm to restore all settings to defaults.");
