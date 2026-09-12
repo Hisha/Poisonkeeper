@@ -63,31 +63,31 @@ local function CommitTarget(edit)
     edit:SetText(tostring(PoisonkeeperDB.poisons[edit.family].targetStock));
 end
 
-Label("Poisonkeeper", 16, 12, "GameFontNormalLarge");
-Label("Rogue poison management, restocking, application, and expiration warnings.", 16, 36);
-Check("Enabled", "Enable Poisonkeeper", 16, 52,
+Label("Poisonkeeper", 24, 12, "GameFontNormalLarge");
+Label("Rogue poison management, restocking, application, and expiration warnings.", 24, 36);
+Check("Enabled", "Enable Poisonkeeper", 24, 52,
     function() return PoisonkeeperDB.enabled; end,
     function(value)
         PoisonkeeperDB.enabled = value;
         Poisonkeeper:ResetWarningBaseline();
         Poisonkeeper:RefreshPoisonBar();
     end);
-Label("Poison Management", 16, 84, "GameFontNormal");
-Label("Managed poisons are automatically restocked at poison vendors.\nUnmanaged poisons you already own may still appear on the application bar.", 16, 102);
+Label("Poison Management", 24, 84, "GameFontNormal");
+Label("Managed poisons are automatically restocked at poison vendors.\nUnmanaged poisons you already own may still appear on the application bar.", 24, 102);
 
 for index, family in ipairs(families) do
     local key = family.key;
-    local y = 128 + (index - 1) * 26;
-    Check("Manage" .. key, "Manage " .. family.label, 16, y,
+    local y = 128 + (index - 1) * 28;
+    Check("Manage" .. key, "Manage " .. family.label, 24, y,
         function() return PoisonkeeperDB.poisons[key].enabled; end,
         function(value)
             PoisonkeeperDB.poisons[key].enabled = value;
             Poisonkeeper:RefreshPoisonBar();
         end);
-    Label("Target Stock:", 300, y + 7);
+    Label("Target Stock:", 284, y + 7);
     local edit = CreateFrame("EditBox", "PoisonkeeperOptionsTarget" .. key, panel, "InputBoxTemplate");
     edit.family = key;
-    edit:SetPoint("TOPLEFT", panel, "TOPLEFT", 390, -y - 2);
+    edit:SetPoint("TOPLEFT", panel, "TOPLEFT", 370, -y - 2);
     edit:SetWidth(65);
     edit:SetHeight(22);
     edit:SetAutoFocus(false);
@@ -110,21 +110,21 @@ for index, family in ipairs(families) do
     targets[#targets + 1] = edit;
 end
 
-Label("Poison Bar", 16, 294, "GameFontNormal");
-Check("Shown", "Show Poison Bar", 16, 310,
+Label("Poison Bar", 24, 304, "GameFontNormal");
+Check("Shown", "Show Poison Bar", 24, 320,
     function() return PoisonkeeperDB.bar.shown; end,
     function(value) PoisonkeeperDB.bar.shown = value; Poisonkeeper:RefreshPoisonBar(); end);
-Check("Locked", "Lock Poison Bar", 200, 310,
+Check("Locked", "Lock Poison Bar", 174, 320,
     function() return PoisonkeeperDB.bar.locked; end,
     function(value) PoisonkeeperDB.bar.locked = value; Poisonkeeper:RefreshPoisonBar(); end);
-Button("ResetPosition", "Reset Bar Position", 350, 312, 165, function()
+Button("ResetPosition", "Reset Bar Position", 50, 350, 165, function()
     PoisonkeeperDB.bar.x, PoisonkeeperDB.bar.y = 0, 0;
     Poisonkeeper:RefreshPoisonBar();
 end);
-Check("Warnings", "Poison Expiration Warnings", 16, 346,
+Check("Warnings", "Poison Expiration Warnings", 330, 304,
     function() return PoisonkeeperDB.warnings.enabled; end,
     function(value) PoisonkeeperDB.warnings.enabled = value; Poisonkeeper:ResetWarningBaseline(); end);
-Label("Warns when temporary weapon enchants approach expiration or expire.", 16, 374);
+Label("Warns when temporary weapon enchants approach expiration or expire.", 356, 336):SetWidth(180);
 
 local function Refresh()
     if not PoisonkeeperDB then return; end
@@ -153,11 +153,9 @@ StaticPopupDialogs["POISONKEEPER_RESET_SETTINGS"] = {
     whileDead = true,
     hideOnEscape = true
 };
-Button("ResetSettings", "Reset Poisonkeeper Settings", 16, 394, 220, function()
+Button("ResetSettings", "Reset Poisonkeeper Settings", 24, 384, 220, function()
     StaticPopup_Show("POISONKEEPER_RESET_SETTINGS");
 end);
-
-Label("Changes save immediately.", 252, 400);
 
 panel.refresh = Refresh;
 panel:SetScript("OnShow", Refresh);
