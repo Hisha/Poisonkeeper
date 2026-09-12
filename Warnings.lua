@@ -1,7 +1,7 @@
 -- Read-only temporary weapon-enchant monitoring for the original 3.3.5 client.
 -- The six-value API cannot identify poison versus another temporary enchant.
 local POLL_SECONDS = 1;
-local WARNING_SECONDS = 40 * 60;
+local WARNING_SECONDS = 5 * 60;
 local REFRESH_INCREASE_SECONDS = 10;
 local MAX_SAMPLE_GAP_SECONDS = 5;
 local frame = CreateFrame("Frame");
