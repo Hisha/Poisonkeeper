@@ -110,3 +110,24 @@ function Poisonkeeper:InitializeSettings()
         PoisonkeeperDB.warnings.enabled = DEFAULT_SETTINGS.warnings.enabled;
     end
 end
+-- Reset uses fresh tables so later edits cannot change the authoritative defaults.
+local function CopyDefaults(value)
+    if type(value) ~= "table" then
+        return value;
+    end
+    local copy = {};
+    for key, child in pairs(value) do
+        copy[key] = CopyDefaults(child);
+    end
+    return copy;
+end
+
+function Poisonkeeper:ResetSettings()
+    -- Preserve references held by Core.lua while replacing every saved setting.
+    for key in pairs(PoisonkeeperDB) do
+        PoisonkeeperDB[key] = nil;
+    end
+    for key, value in pairs(DEFAULT_SETTINGS) do
+        PoisonkeeperDB[key] = CopyDefaults(value);
+    end
+end
